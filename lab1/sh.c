@@ -176,6 +176,39 @@ void run_program(char** argv, int argc, bool foreground, bool doing_pipe)
 	 * 
 	 * 
 	 */
+
+
+	
+	int child_pid; 
+	int child_status;
+	if ((child_pid = fork()) < 0)
+		error("fork failed");
+	else if (child_pid == 0){
+		int i;
+		int list_length = length(path_dir_list);
+		list_t* current_dir_node = path_dir_list; 
+		for(i=0;i<list_length;++i){
+			char file[MAXBUF];
+			sprintf(file, "%s/%s", current_dir_node->data, argv[0]);
+			if(access(file,X_OK) == 0){
+				argv[0]=file;
+				execv(argv[0],argv);
+			}
+			current_dir_node=current_dir_node->succ;	
+		}
+	}
+	else if (foreground){
+		waitpid(child_pid, &child_status, 0);
+	}
+
+
+
+
+
+
+
+
+
 }
 
 void parse_line(void)
@@ -244,6 +277,7 @@ void parse_line(void)
 
 		case NEWLINE:
 		case SEMICOLON:
+
 
 			if (argc == 0)
 				return;
