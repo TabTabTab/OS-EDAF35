@@ -191,6 +191,22 @@ void run_program(char** argv, int argc, bool foreground, bool doing_pipe)
 			char file[MAXBUF];
 			sprintf(file, "%s/%s", current_dir_node->data, argv[0]);
 			if(access(file,X_OK) == 0){
+
+			//	if(doing_pipe){
+					
+				//}
+				//else{
+					if(input_fd!=0){
+						dup2(input_fd,0);				
+						close(input_fd);
+					}
+
+					if(output_fd!=0){
+						dup2(output_fd,1);				
+						close(output_fd);
+					}
+				//}
+				
 				argv[0]=file;
 				execv(argv[0],argv);
 			}
@@ -267,7 +283,9 @@ void parse_line(void)
 
 		case PIPE:
 			doing_pipe = true;
-
+			pipe(pipe_fd);
+			input_fd=pipe_fd[0];
+			output_fd=pipe_fd[1];
 			/*FALLTHROUGH*/
 
 		case AMPERSAND:
@@ -285,8 +303,10 @@ void parse_line(void)
 			argv[argc] = NULL;
 
 			run_program(argv, argc, foreground, doing_pipe);
+			if(!doing_pipe){
+				input_fd	= 0;
 
-			input_fd	= 0;
+			}
 			output_fd	= 0;
 			argc		= 0;
 
