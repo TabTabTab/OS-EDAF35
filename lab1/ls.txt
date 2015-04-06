@@ -1,11 +1,7 @@
-fil
-fil1.txt
-fil2
-fil2.txt
-filt.txt
 list.c
 list.h
 list.o
+ls.txt
 makefile
 removeOld.sh
 sh
