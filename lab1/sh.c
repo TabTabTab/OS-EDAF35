@@ -176,52 +176,33 @@ void run_program(char** argv, int argc, bool foreground, bool doing_pipe)
 	 * 
 	 * 
 	 */
-
-
-	
 	int child_pid; 
 	int child_status;
 	if ((child_pid = fork()) < 0)
 		error("fork failed");
 	else if (child_pid == 0){
-		int i;
-		int list_length = length(path_dir_list);
 		list_t* current_dir_node = path_dir_list; 
-		for(i=0;i<list_length;++i){
+		do{
 			char file[MAXBUF];
-			sprintf(file, "%s/%s", current_dir_node->data, argv[0]);
+			sprintf(file, "%s/%s", (char*)current_dir_node->data, argv[0]);
 			if(access(file,X_OK) == 0){
-	
-				
 				if(input_fd!=0){
 						dup2(input_fd,0);				
 						close(input_fd);
 					}
-
 				if(output_fd!=0){
 						dup2(output_fd,1);				
 						close(output_fd);
 				}
-
-
 				argv[0]=file;
 				execv(argv[0],argv);
 			}
 			current_dir_node=current_dir_node->succ;	
-		}
+		}while(current_dir_node!=path_dir_list);
 	}
 	else if (foreground){
 		waitpid(child_pid, &child_status, 0);
 	}
-
-
-
-
-
-
-
-
-
 }
 
 void parse_line(void)
@@ -302,8 +283,9 @@ void parse_line(void)
 			if(doing_pipe){
 				input_fd=pipe_fd[0];
 				close(pipe_fd[1]);
-				//varför funkar det utan det här?
-				//output_fd=0;
+				/*varför funkar det utan det här?
+				output_fd=0;
+				*/
 			}else{
 				input_fd = 0;
 				output_fd = 0;
