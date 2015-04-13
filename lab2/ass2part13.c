@@ -7,7 +7,8 @@
 static volatile int got_USR2_signal=0; 
 struct sigaction action;
 struct sigaction action2;
-
+int procced =1;
+/*
 void usr2_sig_handler(int signal_code){
 	printf("USR2-Signal\n");
 }
@@ -19,11 +20,24 @@ void int_sig_handler(int signal_code){
 		
 	}
 }
-
+*/
+void alarm_handler(int signal_code){
+	procced =0;
+}
 
 
 int main(){
+	signal(SIGALRM,alarm_handler);
+	alarm(12);
 
+	unsigned long long int counter =0;
+	while(procced){
+		counter++;	
+	}
+	printf("Number of iterations of the loop: %llu",counter);
+
+
+/*
 	time_t endwait;
     time_t start = time(NULL);
     time_t seconds = 10;
@@ -45,6 +59,7 @@ int main(){
 	/*if(sigismember(&pending_set,SIGUSR1)){
 		printf("we got the USR1 - signal!");
 	} */
+/*
 	int i;
 	for(i=0; i < _NSIG-1; ++i){
 		if(sigismember(&pending_set, i)) {
@@ -53,5 +68,5 @@ int main(){
 	}
 
 	
-	printf("after loop\n");
+	printf("after loop\n"); */
 }
